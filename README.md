@@ -32,11 +32,11 @@ A lightweight and extensible abstraction layer for [Dapper](https://github.com/D
 
 ```mermaid
 flowchart TD
-    A[Application / Repository]
-    B[QueryService<br/>Defines delegates & maps DTOs → ViewModels]
-    C[DapperExecutor<br/>Handles query execution, errors, responses]
-    D[IDbConnectionFactory<br/>(e.g., SqlConnectionFactory)]
-    E[Database]
+    A["Application / Repository"]
+    B["QueryService: Defines delegates and maps DTOs to ViewModels"]
+    C["DapperExecutor: Handles query execution, errors, responses"]
+    D["IDbConnectionFactory (e.g., SqlConnectionFactory)"]
+    E["Database"]
 
     A --> B
     B --> C
