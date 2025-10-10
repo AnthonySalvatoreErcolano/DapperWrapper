@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using DapperWrapper.Core;
 using DapperWrapper.Models;
 using System;
 using System.Collections.Generic;
@@ -7,10 +6,8 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DapperWrapper.DapperExecutor
+namespace DapperWrapper.Core
 {
- 
-
     public class Executor
     {
         private readonly IDbConnectionFactory _connectionFactory;
