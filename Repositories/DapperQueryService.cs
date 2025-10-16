@@ -18,9 +18,9 @@ namespace DapperWrapper.Repositories
         // Delegate that users will implement
         public delegate (string Sql, DynamicParameters Params) QueryBuilder<TFilter>(TFilter filters);
 
-        public DapperQueryService(IDbConnectionFactory connectionFactory)
+        public DapperQueryService(Executor executor)
         {
-            _executor = new Executor(connectionFactory);
+            _executor = executor;
         }
 
         public async Task<OperationCollectionResult<TResult>> Get<T, TResult, TFilter>(QueryBuilder<TFilter> builder,TFilter filters,Func<T, TResult>? map = null)
@@ -100,8 +100,6 @@ namespace DapperWrapper.Repositories
         public async Task<OperationCollectionResult<T>> Get<T>((string Sql, DynamicParameters Params) builder) => await Get<T, T>(builder);
         public async Task<OperationCollectionResult<T>> Get<T, TFilter>(QueryBuilder<TFilter> builder, TFilter filters)
            => await Get<T, T, TFilter>(builder, filters);
-
-
 
         public async Task<OperationCollectionResult<TResult>> GetByJoin<T1,T2,TResult>((string Sql, DynamicParameters Params) builder, Func<T1,T2,TResult> tableMap, string splitOn)
         {

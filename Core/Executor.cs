@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DapperWrapper.Builders;
 using DapperWrapper.Models;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,48 @@ namespace DapperWrapper.Core
         {
             return ExecuteQueryInternalAsync(connection => connection.QueryAsync(sql, map, parameters, splitOn: splitOn));
         }
+
+
+        public async Task<OperationResult> InsertAsync<T>(T model)
+        {
+            try
+            {
+                var (sql, parameters) = SqlGenerator.GenerateInsert(model);
+                return await ExecuteNonQuery(sql, parameters);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failed(ex.Message);
+            }
+        }
+
+        public async Task<OperationResult> UpdateAsync<T>(T model)
+        {
+            try
+            {
+                var (sql, parameters) = SqlGenerator.GenerateUpdate(model);
+                return await ExecuteNonQuery(sql, parameters);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failed(ex.Message);
+            }
+        }
+
+        public async Task<OperationResult> DeleteAsync<T>(T model)
+        {
+            try
+            {
+                var (sql, parameters) = SqlGenerator.GenerateDelete(model);
+                return await ExecuteNonQuery(sql, parameters);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failed(ex.Message);
+            }
+        }
+
+
 
         // Non-query (insert/update/delete)
         public async Task<OperationResult> ExecuteNonQuery(string sql, DynamicParameters? parameters = null)

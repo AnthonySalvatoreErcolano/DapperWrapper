@@ -1,27 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	   <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>MyCompany.Data</PackageId>
-    <Version>1.0.0</Version>
-    <Authors>MyCompany</Authors>
-    <Company>MyCompany</Company>
-    <Description>Lightweight Dapper wrapper with standardized responses.</Description>
-    <PackageTags>dapper database wrapper repository</PackageTags>	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	  <PackageId>MyCompany.Data</PackageId>
-	  <Version>1.0.0</Version>
-	  <Authors>MyCompany</Authors>
-	  <Company>MyCompany</Company>
-	  <Description>Lightweight Dapper wrapper with standardized responses.</Description>
-	  
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-  <ItemGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>AE.DapperWrapper</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>Anthony Ercolano</Authors>
+		<Description>Lightweight Dapper wrapper with standardized responses.</Description>
+		<PackageTags>dapper database wrapper repository</PackageTags>
+
+		<PackageProjectUrl>https://github.com/AnthonySalvatoreErcolano/DapperWrapper</PackageProjectUrl>
+		<!-- optional -->
+		<RepositoryUrl>https://github.com/AnthonySalvatoreErcolano/DapperWrapper</RepositoryUrl>
+		<!-- optional -->
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup>
+
+
+	<ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
-  </ItemGroup>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="" />
+		<None Include="LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+	
 
 </Project>

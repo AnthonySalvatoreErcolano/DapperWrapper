@@ -20,30 +20,19 @@ A lightweight and extensible abstraction layer for [Dapper](https://github.com/D
 ## Features
 
 - Unified responses — `OperationResult` and `OperationCollectionResult` provide standardized success/failure handling.  
+- Defines an `Executor` service that  wraps Dappers core functionality and returns unified responses `OperationResult` and `OperationCollectionResult` and standardized success/failure handling.
 - Multi-mapping support — handle complex joins via `QueryAsync<T1, T2, TResult>` and similar overloads.  
 - Delegate-based query builders — reusable, strongly typed SQL generation for flexible repository design.  
-- Optional `QueryService` layer — encapsulate domain-specific logic cleanly on top of `DapperExecutor`.  
+- Optional `QueryService` layer which wraps `Executor`, unifying standard querying commands and mappings.
+- Optional `CommandService` layer which also wraps `Executor` which implements automatic generation of insert/update/delete SQL commands based on the model.
 - DI-ready connection management — swap or configure database connections through `IDbConnectionFactory`.  
 - Minimal overhead — retains all the performance and simplicity of Dapper.  
 
 ---
+## How It Works
 
-## Architecture Overview
-
-```mermaid
-flowchart TD
-    A["Application / Repository"]
-    B["QueryService: Defines delegates and maps DTOs to ViewModels"]
-    C["DapperExecutor: Handles query execution, errors, responses"]
-    D["IDbConnectionFactory (e.g., SqlConnectionFactory)"]
-    E["Database"]
-
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-```
-## Components Explained
+- **Overview**
+  Creates a small wrapper around Dappers base functionality to allow for easier setup when working with the database. The first layer, the `Executor` directly enhances Dappers functionality by implementing standardized return types and status codes for handling different errors. Ontop of the `Executor` there are two services, `DapperQueryService` and `DapperCommandService`; each uses the `Executor` to further extend querying and the toher CRUD operations. `DapperQueryService` 
 
 - **Application / Repository**  
   Calls `QueryService` methods and provides filters or delegates.
