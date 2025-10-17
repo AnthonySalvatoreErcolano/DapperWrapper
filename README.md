@@ -6,15 +6,14 @@ A lightweight and extensible abstraction layer for [Dapper](https://github.com/D
 ## Table of Contents
 
 - [Features](#features)
-- [Architecture Overview](#architecture-overview)
-- [Components Explained](#components-explained)
+- [How It Works](#how-it-works)
 - [Quick Start](#quick-start)
+  - [Register in DI](#register-in-di)
   - [Define the Query Delegate](#define-the-query-delegate)
-  - [Create the QueryService](#create-the-queryservice)
+  - [Create Repositories](#create-repositories)
   - [Use the Service](#use-the-service)
   - [Update / Delete Example](#update--delete-example)
 - [Configuration](#configuration)
-  - [Register in DI](#register-in-di)
   - [Connection Factory Example](#connection-factory-example)
 - [License](#license)
 ## Features
@@ -32,24 +31,32 @@ A lightweight and extensible abstraction layer for [Dapper](https://github.com/D
 ## How It Works
 
 - **Overview**
-  Creates a small wrapper around Dappers base functionality to allow for easier setup when working with the database. The first layer, the `Executor` directly enhances Dappers functionality by implementing standardized return types and status codes for handling different errors. Ontop of the `Executor` there are two services, `DapperQueryService` and `DapperCommandService`; each uses the `Executor` to further extend querying and the toher CRUD operations. `DapperQueryService` 
+ Creates a small wrapper around Dappers base functionality to allow for easier setup when working with the database. The first layer, the `Executor` directly enhances Dappers functionality by implementing standardized return types and status codes for handling different errors. Ontop of the `Executor` there are two services, `DapperQueryService` and `DapperCommandService`; each uses the `Executor` to further extend querying and the other CRUD operations. `DapperQueryService` contains `Get` methods that consume the query delegates and allow for mapping (like a DTO to a view model). `DapperCommandService` directly wraps the `Executor` with no new functionality as of yet, the `Executor` use the automatic command builder `SqlGenerator` to consume the model and based on the attributes `ColumneAttribute` and `TableAttribute` creates a sql command and the dynamic parameters.  
 
-- **Application / Repository**  
-  Calls `QueryService` methods and provides filters or delegates.
-
+- **Repository**
+   Calls `QueryService` or `CommandService` methods and provides filters or delegates.
 - **QueryService**  
   Accepts user-defined `QueryBuilder<TFilter>` delegates, optionally maps DTOs to ViewModels, and returns `OperationResult` or `OperationCollectionResult`.
 
-- **DapperExecutor**  
-  Executes SQL queries using Dapper, catches exceptions, and wraps results in standardized response objects.
+- **QueryService**  
+  Handles non-query operations (insert/update/delete) with standardized `OperationResult`. Uses the automatic command builder `SqlGenerator`
+
+- **Executor**  
+  Executes SQL queries/commands using Dapper, catches exceptions, and wraps results in standardized response objects.
 
 - **IDbConnectionFactory**  
   Provides new `IDbConnection` instances for each operation, enabling DI-friendly and testable database access.
 
-- **Database**  
-  SQL Server (or any other DB) queried via the connection.
-
 ## Quick Start
+
+### Register in DI
+
+```csharp
+    services.AddSingleton<IDbConnectionFactory>(new SqlConnectionFactory(connectionString));
+    services.AddScoped<Executor>();
+    services.AddScoped<QueryService, EmployeeQueryService>();
+    services.AddScoped<CommandService, EmployeeCommandService>();
+```
 
 ### Define the Query Delegate
 
@@ -77,77 +84,23 @@ public static class EmployeeQueries
     }
 }
 ```
-### Create the QueryService
+### Create Repositories
 ```csharp
-public class EmployeeQueryService : QueryService
+public class EmployeeRepository
 {
-    public EmployeeQueryService(DapperExecutor executor) : base(executor) { }
+    private readonly DapperQueryService _query;
+    private readonly DapperCommandService _command;
 
-    public Task<OperationCollectionResult<EmployeeVM>> GetEmployees(EmployeeFilter filter)
-        => Get<EmployeeDTO, EmployeeVM, EmployeeFilter>(
-            EmployeeQueries.GetEmployees,
-            filter,
-            dto => new EmployeeVM(dto)
-        );
+    public EmployeeQueryService(DapperQueryService query, DapperCommandService command) 
+    { 
+        _query=query;
+        _command=command;
+    }
 
-    public Task<OperationResult> AddEmployee(EmployeeCreateModel model)
-        => Execute(EmployeeQueries.InsertEmployee, model);
+    public async Task<TransactionCollectionResponse<TResult>> GetByEmployeeId<TResult>(string employeeId, Func<EmployeeDTO, TResult>? map = null) => await executor.Get<EmployeeDTO, TResult, EmployeeFilters>(GetEmployeedsById, new EmployeeFilters { EmployeeId = employeeId }, map);
+
+    public Task<OperationResult> CreateEmployee(Employee employee)=> _command.InsertAsync(employee);
 }
-```
-
-### Use the Service
-```csharp
-var service = new EmployeeQueryService(executor);
-
-// Get employees
-var result = await service.GetEmployees(new EmployeeFilter { DepartmentId = "HR" });
-
-if (result.Value == ResponseValue.Success)
-{
-    foreach (var e in result.Data!)
-        Console.WriteLine($"{e.Id}: {e.FirstName} {e.LastName}");
-}
-else if (result.Value == ResponseValue.NotFound)
-{
-    Console.WriteLine("No employees found in that department.");
-}
-
-// Insert employee
-var insertResult = await service.AddEmployee(new EmployeeCreateModel
-{
-    FirstName = "John",
-    LastName = "Doe",
-    DepartmentId = "HR"
-});
-
-if (insertResult.Value == ResponseValue.Success)
-{
-    Console.WriteLine("Employee added successfully.");
-}
-else
-{
-    Console.WriteLine($"Error adding employee: {insertResult.ResponseText}");
-}
-```
-### Update / Delete Example
-```csharp
-var updateResult = await service.Execute(EmployeeQueries.UpdateEmployee, updateModel);
-if (updateResult.Value == ResponseValue.Success)
-    Console.WriteLine("Updated successfully.");
-
-// Delete example
-var deleteResult = await service.Execute(EmployeeQueries.DeleteEmployee, deleteModel);
-if (deleteResult.Value == ResponseValue.Success)
-    Console.WriteLine("Deleted successfully.");
-
-```
-
-## Configuration
-### Register in DI:
-```csharp
-services.AddSingleton<IDbConnectionFactory>(new SqlConnectionFactory(connectionString));
-services.AddScoped<DapperExecutor>();
-services.AddScoped<QueryService, EmployeeQueryService>();
 ```
 
 ### Connection Factory Example:
