@@ -38,7 +38,49 @@ namespace DapperWrapper.Core
             return ExecuteQueryInternalAsync(connection => connection.QueryAsync(sql, map, parameters, splitOn: splitOn));
         }
 
+        public async Task<OperationCollectionResult<T1, T2>> ExecuteQueryMultipleAsync<T1, T2>(
+            string sql,
+            DynamicParameters? parameters = null)
+        {
+            try
+            {
+                using var connection = _connectionFactory.CreateConnection();
+                using var multi = await connection.QueryMultipleAsync(sql, parameters);
 
+                var first = multi.Read<T1>().ToList();
+                var second = multi.Read<T2>().ToList();
+
+                return OperationCollectionResult<T1, T2>.Success(first, second);
+            }
+            catch (Exception ex)
+            {
+                return OperationCollectionResult<T1, T2>.Failed(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Executes multiple queries in one SQL statement and returns three result sets.
+        /// </summary>
+        public async Task<OperationCollectionResult<T1, T2, T3>> ExecuteQueryMultipleAsync<T1, T2, T3>(
+            string sql,
+            DynamicParameters? parameters = null)
+        {
+            try
+            {
+                using var connection = _connectionFactory.CreateConnection();
+                using var multi = await connection.QueryMultipleAsync(sql, parameters);
+
+                var first = multi.Read<T1>().ToList();
+                var second = multi.Read<T2>().ToList();
+                var third = multi.Read<T3>().ToList();
+
+                return OperationCollectionResult<T1, T2, T3>.Success(first, second, third);
+            }
+            catch (Exception ex)
+            {
+                return OperationCollectionResult<T1, T2, T3>.Failed(ex.Message);
+            }
+        }
         public async Task<OperationResult> InsertAsync<T>(T model)
         {
             try

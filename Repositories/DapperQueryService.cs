@@ -12,7 +12,7 @@ namespace DapperWrapper.Repositories
 
         // Delegate that users will implement
         public delegate (string Sql, DynamicParameters Params) QueryBuilder<TFilter>(TFilter filters);
-        public delegate (string, DynamicParameters) QueryBuilder(params string[] filters);
+        public delegate (string Sql, DynamicParameters Params) MultiQueryBuilder<TFilter>(TFilter filters);
         public DapperQueryService(Executor executor)
         {
             _executor = executor;
@@ -60,6 +60,25 @@ namespace DapperWrapper.Repositories
         public async Task<OperationCollectionResult<T>> Get<T>((string Sql, DynamicParameters Params) builder) => await Get<T, T>(builder);
         public async Task<OperationCollectionResult<T>> Get<T, TFilter>(QueryBuilder<TFilter> builder, TFilter filters)
            => await Get<T, T, TFilter>(builder, filters);
+        public async Task<OperationCollectionResult<T1, T2>> GetMulti<T1, T2, TFilter>(QueryBuilder<TFilter> builder, TFilter filters)
+        {
+            var (sql, parameters) = builder(filters);
+
+            if (string.IsNullOrWhiteSpace(sql))
+                return OperationCollectionResult<T1, T2>.Invalid("SQL cannot be empty.");
+            return await _executor.ExecuteQueryMultipleAsync<T1, T2>(sql, parameters);
+            try
+            {
+                 var multi = await _executor.ExecuteQueryMultipleAsync<T1,T2>(sql, parameters);
+
+
+                return OperationCollectionResult<T1, T2>.Success(multi.FirstResult, multi.SecondResult);
+            }
+            catch (Exception ex)
+            {
+                return OperationCollectionResult<T1, T2>.Failed(ex.Message);
+            }
+        }
 
         public async Task<OperationCollectionResult<TResult>> GetByJoin<T1,T2,TResult>((string Sql, DynamicParameters Params) builder, Func<T1,T2,TResult> tableMap, string splitOn)
         {
