@@ -45,4 +45,41 @@ namespace DapperWrapper.Models
         };
 
     }
+
+    public class OperationResult<T>:OperationResult
+    {
+        public T Data { get; set; }
+        public bool IsSuccess => Value == ResponseValue.Success || Value == ResponseValue.Warning;
+
+        public static OperationResult<T> Success(string msg = "Success") => new()
+        {
+            Value = ResponseValue.Success,
+            ResponseText = msg
+        };
+
+        public static OperationResult<T> Failed(string msg = "Operation failed") => new()
+        {
+            Value = ResponseValue.Failed,
+            ResponseText = msg
+        };
+
+        public static OperationResult<T> NotFound(string msg = "No records found") => new()
+        {
+            Value = ResponseValue.NotFound,
+            ResponseText = msg
+        };
+
+        public static OperationResult<T> Invalid(string msg = "Invalid request") => new()
+        {
+            Value = ResponseValue.Invalid,
+            ResponseText = msg
+        };
+
+        public static OperationResult<T> Unauthorized(string msg = "Unauthorized") => new()
+        {
+            Value = ResponseValue.Unauthorized,
+            ResponseText = msg
+        };
+
+    }
 }
