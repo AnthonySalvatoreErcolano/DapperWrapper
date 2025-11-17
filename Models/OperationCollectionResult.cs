@@ -1,53 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DapperWrapper.Models
+﻿namespace DapperWrapper.Models
 {
-    public class OperationCollectionResult<T> : OperationResult
+    public class OperationCollectionResult<T>
     {
+        public string ResponseText { get; set; } = string.Empty;
+        public ResponseValue Value { get; set; }
         public IEnumerable<T>? Data { get; set; }
 
-        public static OperationCollectionResult<T> Success(IEnumerable<T> data, string msg = "Success") => new()
+        private static OperationCollectionResult<T> Create(ResponseValue value, string msg, IEnumerable<T>? data = null) => new()
         {
-            Value = ResponseValue.Success,
+            Value = value,
             ResponseText = msg,
             Data = data
         };
 
-        public static OperationCollectionResult<T> Failed(string msg = "Operation failed") => new()
-        {
-            Value = ResponseValue.Failed,
-            ResponseText = msg,
-            Data = null
-        };
+        public static OperationCollectionResult<T> Success(IEnumerable<T> data, string msg = "Success")
+            => Create(ResponseValue.Success, msg, data);
 
-        public static OperationCollectionResult<T> NotFound(string msg = "No records found") => new()
-        {
-            Value = ResponseValue.NotFound,
-            ResponseText = msg,
-            Data = Enumerable.Empty<T>()
-        };
+        public static OperationCollectionResult<T> Success(string msg = "Success")
+            => Create(ResponseValue.Success, msg);
 
-        public static OperationCollectionResult<T> Invalid(string msg = "Invalid request") => new()
-        {
-            Value = ResponseValue.Invalid,
-            ResponseText = msg,
-            Data = null
-        };
+        public static OperationCollectionResult<T> Failed(string msg = "Operation failed")
+            => Create(ResponseValue.Failed, msg);
 
-        public static OperationCollectionResult<T> Unauthorized(string msg = "Unauthorized") => new()
-        {
-            Value = ResponseValue.Unauthorized,
-            ResponseText = msg,
-            Data = null
-        };
+        public static OperationCollectionResult<T> NotFound(string msg = "No records found")
+            => Create(ResponseValue.NotFound, msg);
+
+        public static OperationCollectionResult<T> Invalid(string msg = "Invalid request")
+            => Create(ResponseValue.Invalid, msg);
+
+        public static OperationCollectionResult<T> Unauthorized(string msg = "Unauthorized")
+            => Create(ResponseValue.Unauthorized, msg);
     }
 
-    public class OperationCollectionResult<T1,T2> : OperationResult
+    public class OperationCollectionResult<T1, T2>
     {
+        public string ResponseText { get; set; } = string.Empty;
+        public ResponseValue Value { get; set; }
         public IEnumerable<T1>? FirstResult { get; set; }
         public IEnumerable<T2>? SecondResult { get; set; }
         public static OperationCollectionResult<T1, T2> Success(IEnumerable<T1> data1, IEnumerable<T2> data2, string msg = "Success") => new()
@@ -73,15 +61,15 @@ namespace DapperWrapper.Models
             FirstResult = Enumerable.Empty<T1>(),
             SecondResult = Enumerable.Empty<T2>()
         };
-        public static OperationCollectionResult<T1,T2> Invalid(string msg = "Invalid request") => new()
+        public static OperationCollectionResult<T1, T2> Invalid(string msg = "Invalid request") => new()
         {
             Value = ResponseValue.Invalid,
             ResponseText = msg,
             FirstResult = null,
-            SecondResult= null
+            SecondResult = null
         };
 
-        public static OperationCollectionResult<T1,T2> Unauthorized(string msg = "Unauthorized") => new()
+        public static OperationCollectionResult<T1, T2> Unauthorized(string msg = "Unauthorized") => new()
         {
             Value = ResponseValue.Unauthorized,
             ResponseText = msg,
@@ -90,8 +78,10 @@ namespace DapperWrapper.Models
         };
     }
 
-    public class OperationCollectionResult<T1, T2, T3> : OperationResult
+    public class OperationCollectionResult<T1, T2, T3>
     {
+        public string ResponseText { get; set; } = string.Empty;
+        public ResponseValue Value { get; set; }
         public IEnumerable<T1>? FirstResult { get; set; }
         public IEnumerable<T2>? SecondResult { get; set; }
         public IEnumerable<T3>? ThirdResult { get; set; }
@@ -145,6 +135,7 @@ namespace DapperWrapper.Models
             ThirdResult = null
         };
     }
+
 
 
 }

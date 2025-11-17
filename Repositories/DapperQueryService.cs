@@ -1,5 +1,6 @@
-﻿using DapperWrapper.Core;
-using Dapper;
+﻿using Dapper;
+using DapperWrapper.Core;
+using DapperWrapper.Extensions;
 using DapperWrapper.Models;
 
 namespace DapperWrapper.Repositories
@@ -18,7 +19,7 @@ namespace DapperWrapper.Repositories
             _executor = executor;
         }
 
-        public async Task<OperationCollectionResult<TResult>> Get<T, TResult, TFilter>(QueryBuilder<TFilter> builder,TFilter filters,Func<T, TResult>? map = null)
+        public async Task<OperationCollectionResult<TResult>> Get<T, TResult, TFilter>(QueryBuilder<TFilter> builder, TFilter filters, Func<T, TResult>? map = null)
         {
             var (sql, parameters) = builder(filters);
 
@@ -30,19 +31,19 @@ namespace DapperWrapper.Repositories
                 {
                     var data = (await _executor.ExecuteQueryAsync<TResult>(sql, parameters));
 
-                    if (data == null || data.Data == null) 
+                    if (data == null || data.Data == null)
                         return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                    if(data.IsSuccess==false) 
+                    if (data.IsSuccess == false)
                         return OperationCollectionResult<TResult>.Failed(data.ResponseText);
 
-                    return data.Data.Any()? OperationCollectionResult<TResult>.Success(data.Data): OperationCollectionResult<TResult>.NotFound("No records found.");
+                    return data.Data.Any() ? OperationCollectionResult<TResult>.Success(data.Data) : OperationCollectionResult<TResult>.NotFound("No records found.");
                 }
                 else
                 {
                     var baseData = (await _executor.ExecuteQueryAsync<T>(sql, parameters));
-                    if (baseData==null || baseData.Data==null) 
+                    if (baseData == null || baseData.Data == null)
                         return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                    if(baseData.Data.Any() == false) 
+                    if (baseData.Data.Any() == false)
                         return OperationCollectionResult<TResult>.NotFound("No records found.");
 
                     var mapped = baseData.Data.Select(map);
@@ -69,7 +70,7 @@ namespace DapperWrapper.Repositories
             return await _executor.ExecuteQueryMultipleAsync<T1, T2>(sql, parameters);
             try
             {
-                 var multi = await _executor.ExecuteQueryMultipleAsync<T1,T2>(sql, parameters);
+                var multi = await _executor.ExecuteQueryMultipleAsync<T1, T2>(sql, parameters);
 
 
                 return OperationCollectionResult<T1, T2>.Success(multi.FirstResult, multi.SecondResult);
@@ -80,33 +81,7 @@ namespace DapperWrapper.Repositories
             }
         }
 
-        public async Task<OperationCollectionResult<TResult>> GetByJoin<T1,T2,TResult>((string Sql, DynamicParameters Params) builder, Func<T1,T2,TResult> tableMap, string splitOn)
-        {
-            var (sql, parameters) = builder;
-
-            if (string.IsNullOrWhiteSpace(sql))
-                return OperationCollectionResult<TResult>.Invalid("SQL cannot be empty.");
-            if (tableMap == null) 
-                return OperationCollectionResult<TResult>.Invalid("Table mapper cannot be null.");
-            
-            try
-            {
-                var data = (await _executor.ExecuteQueryAsync<T1,T2,TResult>(sql, parameters, tableMap,splitOn));
-                if (data == null || data.Data == null)
-                    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                if (data.Data.Any() == false)
-                    return OperationCollectionResult<TResult>.NotFound("No records found.");
-
-                return OperationCollectionResult<TResult>.Success(data.Data);
-                
-            }
-            catch (Exception ex)
-            {
-                return OperationCollectionResult<TResult>.Failed(ex.Message);
-            }
-
-        }
-        public async Task<OperationCollectionResult<TResult>> GetByJoin<T1, T2, T3,TResult>((string Sql, DynamicParameters Params) builder, Func<T1, T2,T3, TResult> tableMap, string splitOn)
+        public async Task<OperationCollectionResult<TResult>> GetByJoin<T1, T2, TResult>((string Sql, DynamicParameters Params) builder, Func<T1, T2, TResult> tableMap, string splitOn)
         {
             var (sql, parameters) = builder;
 
@@ -117,7 +92,7 @@ namespace DapperWrapper.Repositories
 
             try
             {
-                var data = (await _executor.ExecuteQueryAsync<T1, T2,T3, TResult>(sql, parameters, tableMap, splitOn));
+                var data = (await _executor.ExecuteQueryAsync<T1, T2, TResult>(sql, parameters, tableMap, splitOn));
                 if (data == null || data.Data == null)
                     return OperationCollectionResult<TResult>.Invalid("Invalid search");
                 if (data.Data.Any() == false)
@@ -132,7 +107,7 @@ namespace DapperWrapper.Repositories
             }
 
         }
-        public async Task<OperationCollectionResult<TResult>> GetByJoin<T1, T2, T3,T4, TResult>((string Sql, DynamicParameters Params) builder, Func<T1, T2, T3,T4, TResult> tableMap, string splitOn)
+        public async Task<OperationCollectionResult<TResult>> GetByJoin<T1, T2, T3, TResult>((string Sql, DynamicParameters Params) builder, Func<T1, T2, T3, TResult> tableMap, string splitOn)
         {
             var (sql, parameters) = builder;
 
@@ -143,7 +118,33 @@ namespace DapperWrapper.Repositories
 
             try
             {
-                var data = (await _executor.ExecuteQueryAsync<T1, T2, T3,T4, TResult>(sql, parameters, tableMap, splitOn));
+                var data = (await _executor.ExecuteQueryAsync<T1, T2, T3, TResult>(sql, parameters, tableMap, splitOn));
+                if (data == null || data.Data == null)
+                    return OperationCollectionResult<TResult>.Invalid("Invalid search");
+                if (data.Data.Any() == false)
+                    return OperationCollectionResult<TResult>.NotFound("No records found.");
+
+                return OperationCollectionResult<TResult>.Success(data.Data);
+
+            }
+            catch (Exception ex)
+            {
+                return OperationCollectionResult<TResult>.Failed(ex.Message);
+            }
+
+        }
+        public async Task<OperationCollectionResult<TResult>> GetByJoin<T1, T2, T3, T4, TResult>((string Sql, DynamicParameters Params) builder, Func<T1, T2, T3, T4, TResult> tableMap, string splitOn)
+        {
+            var (sql, parameters) = builder;
+
+            if (string.IsNullOrWhiteSpace(sql))
+                return OperationCollectionResult<TResult>.Invalid("SQL cannot be empty.");
+            if (tableMap == null)
+                return OperationCollectionResult<TResult>.Invalid("Table mapper cannot be null.");
+
+            try
+            {
+                var data = (await _executor.ExecuteQueryAsync<T1, T2, T3, T4, TResult>(sql, parameters, tableMap, splitOn));
                 if (data == null || data.Data == null)
                     return OperationCollectionResult<TResult>.Invalid("Invalid search");
                 if (data.Data.Any() == false)

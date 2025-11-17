@@ -1,85 +1,65 @@
-﻿using System;
-using System.ClientModel.Primitives;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DapperWrapper.Models
+﻿namespace DapperWrapper.Models
 {
     public class OperationResult
     {
         public string ResponseText { get; set; } = string.Empty;
         public ResponseValue Value { get; set; }
 
-        public bool IsSuccess => Value == ResponseValue.Success || Value == ResponseValue.Warning;
+        // ----- Shared factory -----
+        protected static TRes Create<TRes>(ResponseValue value, string msg)
+            where TRes : OperationResult, new()
+            => new()
+            {
+                Value = value,
+                ResponseText = msg
+            };
 
-        public static OperationResult Success(string msg = "Success") => new()
-        {
-            Value = ResponseValue.Success,
-            ResponseText = msg
-        };
+        public static OperationResult Success(string msg = "Success")
+            => Create<OperationResult>(ResponseValue.Success, msg);
 
-        public static OperationResult Failed(string msg = "Operation failed") => new()
-        {
-            Value = ResponseValue.Failed,
-            ResponseText = msg
-        };
+        public static OperationResult Failed(string msg = "Operation failed")
+            => Create<OperationResult>(ResponseValue.Failed, msg);
 
-        public static OperationResult NotFound(string msg = "No records found") => new()
-        {
-            Value = ResponseValue.NotFound,
-            ResponseText = msg
-        };
+        public static OperationResult NotFound(string msg = "No records found")
+            => Create<OperationResult>(ResponseValue.NotFound, msg);
 
-        public static OperationResult Invalid(string msg = "Invalid request") => new()
-        {
-            Value = ResponseValue.Invalid,
-            ResponseText = msg
-        };
+        public static OperationResult Invalid(string msg = "Invalid request")
+            => Create<OperationResult>(ResponseValue.Invalid, msg);
 
-        public static OperationResult Unauthorized(string msg = "Unauthorized") => new()
-        {
-            Value = ResponseValue.Unauthorized,
-            ResponseText = msg
-        };
-
+        public static OperationResult Unauthorized(string msg = "Unauthorized")
+            => Create<OperationResult>(ResponseValue.Unauthorized, msg);
     }
 
-    public class OperationResult<T>:OperationResult
+
+    public class OperationResult<T> : OperationResult
     {
-        public T Data { get; set; }
-        public bool IsSuccess => Value == ResponseValue.Success || Value == ResponseValue.Warning;
+        public T? Data { get; set; }
 
-        public static OperationResult<T> Success(string msg = "Success") => new()
-        {
-            Value = ResponseValue.Success,
-            ResponseText = msg
-        };
+        // ----- Generic versions using shared base factory -----
+        private static OperationResult<T> Create(ResponseValue value, string msg, T? data = default)
+            => new()
+            {
+                Value = value,
+                ResponseText = msg,
+                Data = data
+            };
 
-        public static OperationResult<T> Failed(string msg = "Operation failed") => new()
-        {
-            Value = ResponseValue.Failed,
-            ResponseText = msg
-        };
+        public static OperationResult<T> Success(T data, string msg = "Success")
+            => Create(ResponseValue.Success, msg, data);
 
-        public static OperationResult<T> NotFound(string msg = "No records found") => new()
-        {
-            Value = ResponseValue.NotFound,
-            ResponseText = msg
-        };
+        public static OperationResult<T> Success(string msg = "Success")
+            => Create(ResponseValue.Success, msg);
 
-        public static OperationResult<T> Invalid(string msg = "Invalid request") => new()
-        {
-            Value = ResponseValue.Invalid,
-            ResponseText = msg
-        };
+        public static OperationResult<T> Failed(string msg = "Operation failed")
+            => Create(ResponseValue.Failed, msg);
 
-        public static OperationResult<T> Unauthorized(string msg = "Unauthorized") => new()
-        {
-            Value = ResponseValue.Unauthorized,
-            ResponseText = msg
-        };
+        public static OperationResult<T> NotFound(string msg = "No records found")
+            => Create(ResponseValue.NotFound, msg);
 
+        public static OperationResult<T> Invalid(string msg = "Invalid request")
+            => Create(ResponseValue.Invalid, msg);
+
+        public static OperationResult<T> Unauthorized(string msg = "Unauthorized")
+            => Create(ResponseValue.Unauthorized, msg);
     }
 }

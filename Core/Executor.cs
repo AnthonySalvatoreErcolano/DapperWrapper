@@ -21,19 +21,19 @@ namespace DapperWrapper.Core
         }
 
         // 2-table mapping
-        public Task<OperationCollectionResult<TResult>> ExecuteQueryAsync<T1, T2, TResult>(string sql,DynamicParameters parameters,Func<T1, T2, TResult> map,string splitOn)
+        public Task<OperationCollectionResult<TResult>> ExecuteQueryAsync<T1, T2, TResult>(string sql, DynamicParameters parameters, Func<T1, T2, TResult> map, string splitOn)
         {
-            return ExecuteQueryInternalAsync(connection =>connection.QueryAsync(sql, map, parameters, splitOn: splitOn));
+            return ExecuteQueryInternalAsync(connection => connection.QueryAsync(sql, map, parameters, splitOn: splitOn));
         }
 
         // 3-table mapping
-        public Task<OperationCollectionResult<TResult>> ExecuteQueryAsync<T1, T2, T3, TResult>(string sql,DynamicParameters parameters,Func<T1, T2, T3, TResult> map,string splitOn)
+        public Task<OperationCollectionResult<TResult>> ExecuteQueryAsync<T1, T2, T3, TResult>(string sql, DynamicParameters parameters, Func<T1, T2, T3, TResult> map, string splitOn)
         {
             return ExecuteQueryInternalAsync(connection => connection.QueryAsync(sql, map, parameters, splitOn: splitOn));
         }
 
         // 4-table mapping
-        public Task<OperationCollectionResult<TResult>> ExecuteQueryAsync<T1, T2, T3, T4, TResult>(string sql,DynamicParameters parameters,Func<T1, T2, T3, T4, TResult> map,string splitOn)
+        public Task<OperationCollectionResult<TResult>> ExecuteQueryAsync<T1, T2, T3, T4, TResult>(string sql, DynamicParameters parameters, Func<T1, T2, T3, T4, TResult> map, string splitOn)
         {
             return ExecuteQueryInternalAsync(connection => connection.QueryAsync(sql, map, parameters, splitOn: splitOn));
         }
