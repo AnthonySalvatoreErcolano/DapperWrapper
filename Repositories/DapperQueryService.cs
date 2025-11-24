@@ -29,25 +29,22 @@ namespace DapperWrapper.Repositories
             {
                 if (map == null)
                 {
-                    var data = (await _executor.ExecuteQueryAsync<TResult>(sql, parameters));
+                    return (await _executor.ExecuteQueryAsync<TResult>(sql, parameters));
 
-                    if (data == null || data.Data == null)
-                        return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                    if (data.IsSuccess == false)
-                        return OperationCollectionResult<TResult>.Failed(data.ResponseText);
+                    //if (data == null || data.Data == null)
+                    //    return OperationCollectionResult<TResult>.Invalid("Invalid search");
+                    //if (data.IsSuccess == false)
+                    //    return OperationCollectionResult<TResult>.Failed(data.ResponseText);
 
-                    return data.Data.Any() ? OperationCollectionResult<TResult>.Success(data.Data) : OperationCollectionResult<TResult>.NotFound("No records found.");
+                    //return data.Data.Any() ? OperationCollectionResult<TResult>.Success(data.Data) : OperationCollectionResult<TResult>.NotFound("No records found.");
                 }
                 else
                 {
                     var baseData = (await _executor.ExecuteQueryAsync<T>(sql, parameters));
                     if (baseData == null || baseData.Data == null)
-                        return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                    if (baseData.Data.Any() == false)
-                        return OperationCollectionResult<TResult>.NotFound("No records found.");
-
-                    var mapped = baseData.Data.Select(map);
-                    return OperationCollectionResult<TResult>.Success(mapped);
+                        return OperationCollectionResult<TResult>.Failed(baseData?.ResponseText??"Error");
+                   
+                    return OperationCollectionResult<TResult>.Success(baseData.Data.Select(map));
                 }
             }
             catch (Exception ex)
@@ -92,13 +89,13 @@ namespace DapperWrapper.Repositories
 
             try
             {
-                var data = (await _executor.ExecuteQueryAsync<T1, T2, TResult>(sql, parameters, tableMap, splitOn));
-                if (data == null || data.Data == null)
-                    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                if (data.Data.Any() == false)
-                    return OperationCollectionResult<TResult>.NotFound("No records found.");
+                return (await _executor.ExecuteQueryAsync<T1, T2, TResult>(sql, parameters, tableMap, splitOn));
+                //if (data == null)
+                //    return OperationCollectionResult<TResult>.Failed("Invalid search");
+                //if (data.Data.Any() == false)
+                //    return OperationCollectionResult<TResult>.NotFound("No records found.");
 
-                return OperationCollectionResult<TResult>.Success(data.Data);
+                //return OperationCollectionResult<TResult>.Success(data.Data);
 
             }
             catch (Exception ex)
@@ -118,13 +115,13 @@ namespace DapperWrapper.Repositories
 
             try
             {
-                var data = (await _executor.ExecuteQueryAsync<T1, T2, T3, TResult>(sql, parameters, tableMap, splitOn));
-                if (data == null || data.Data == null)
-                    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                if (data.Data.Any() == false)
-                    return OperationCollectionResult<TResult>.NotFound("No records found.");
+                return (await _executor.ExecuteQueryAsync<T1, T2, T3, TResult>(sql, parameters, tableMap, splitOn));
+                //if (data == null || data.Data == null)
+                //    return OperationCollectionResult<TResult>.Invalid("Invalid search");
+                //if (data.Data.Any() == false)
+                //    return OperationCollectionResult<TResult>.NotFound("No records found.");
 
-                return OperationCollectionResult<TResult>.Success(data.Data);
+                //return OperationCollectionResult<TResult>.Success(data.Data);
 
             }
             catch (Exception ex)
@@ -144,13 +141,13 @@ namespace DapperWrapper.Repositories
 
             try
             {
-                var data = (await _executor.ExecuteQueryAsync<T1, T2, T3, T4, TResult>(sql, parameters, tableMap, splitOn));
-                if (data == null || data.Data == null)
-                    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                if (data.Data.Any() == false)
-                    return OperationCollectionResult<TResult>.NotFound("No records found.");
+                return (await _executor.ExecuteQueryAsync<T1, T2, T3, T4, TResult>(sql, parameters, tableMap, splitOn));
+                //if (data == null || data.Data == null)
+                //    return OperationCollectionResult<TResult>.Invalid("Invalid search");
+                //if (data.Data.Any() == false)
+                //    return OperationCollectionResult<TResult>.NotFound("No records found.");
 
-                return OperationCollectionResult<TResult>.Success(data.Data);
+                //return OperationCollectionResult<TResult>.Success(data.Data);
 
             }
             catch (Exception ex)

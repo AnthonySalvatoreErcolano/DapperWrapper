@@ -142,8 +142,7 @@ namespace DapperWrapper.Core
         }
 
         // Internal shared logic for SELECT queries
-        private async Task<OperationCollectionResult<TResult>> ExecuteQueryInternalAsync<TResult>(
-            Func<IDbConnection, Task<IEnumerable<TResult>>> queryFunc)
+        private async Task<OperationCollectionResult<TResult>> ExecuteQueryInternalAsync<TResult>(Func<IDbConnection, Task<IEnumerable<TResult>>> queryFunc)
         {
             try
             {
