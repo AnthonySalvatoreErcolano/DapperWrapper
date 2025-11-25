@@ -31,18 +31,12 @@ namespace DapperWrapper.Repositories
                 {
                     return (await _executor.ExecuteQueryAsync<TResult>(sql, parameters));
 
-                    //if (data == null || data.Data == null)
-                    //    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                    //if (data.IsSuccess == false)
-                    //    return OperationCollectionResult<TResult>.Failed(data.ResponseText);
-
-                    //return data.Data.Any() ? OperationCollectionResult<TResult>.Success(data.Data) : OperationCollectionResult<TResult>.NotFound("No records found.");
                 }
                 else
                 {
                     var baseData = (await _executor.ExecuteQueryAsync<T>(sql, parameters));
-                    if (baseData == null || baseData.Data == null)
-                        return OperationCollectionResult<TResult>.Failed(baseData?.ResponseText??"Error");
+                    if (baseData == null)return OperationCollectionResult<TResult>.Failed(baseData?.ResponseText??"Error");
+                    if (baseData.Data == null) return new OperationCollectionResult<TResult> { ResponseText=baseData.ResponseText,Value=baseData.Value};
                    
                     return OperationCollectionResult<TResult>.Success(baseData.Data.Select(map));
                 }
@@ -65,17 +59,7 @@ namespace DapperWrapper.Repositories
             if (string.IsNullOrWhiteSpace(sql))
                 return OperationCollectionResult<T1, T2>.Invalid("SQL cannot be empty.");
             return await _executor.ExecuteQueryMultipleAsync<T1, T2>(sql, parameters);
-            try
-            {
-                var multi = await _executor.ExecuteQueryMultipleAsync<T1, T2>(sql, parameters);
-
-
-                return OperationCollectionResult<T1, T2>.Success(multi.FirstResult, multi.SecondResult);
-            }
-            catch (Exception ex)
-            {
-                return OperationCollectionResult<T1, T2>.Failed(ex.Message);
-            }
+           
         }
 
         public async Task<OperationCollectionResult<TResult>> GetByJoin<T1, T2, TResult>((string Sql, DynamicParameters Params) builder, Func<T1, T2, TResult> tableMap, string splitOn)
@@ -90,12 +74,7 @@ namespace DapperWrapper.Repositories
             try
             {
                 return (await _executor.ExecuteQueryAsync<T1, T2, TResult>(sql, parameters, tableMap, splitOn));
-                //if (data == null)
-                //    return OperationCollectionResult<TResult>.Failed("Invalid search");
-                //if (data.Data.Any() == false)
-                //    return OperationCollectionResult<TResult>.NotFound("No records found.");
-
-                //return OperationCollectionResult<TResult>.Success(data.Data);
+               
 
             }
             catch (Exception ex)
@@ -116,12 +95,7 @@ namespace DapperWrapper.Repositories
             try
             {
                 return (await _executor.ExecuteQueryAsync<T1, T2, T3, TResult>(sql, parameters, tableMap, splitOn));
-                //if (data == null || data.Data == null)
-                //    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                //if (data.Data.Any() == false)
-                //    return OperationCollectionResult<TResult>.NotFound("No records found.");
-
-                //return OperationCollectionResult<TResult>.Success(data.Data);
+              
 
             }
             catch (Exception ex)
@@ -142,12 +116,7 @@ namespace DapperWrapper.Repositories
             try
             {
                 return (await _executor.ExecuteQueryAsync<T1, T2, T3, T4, TResult>(sql, parameters, tableMap, splitOn));
-                //if (data == null || data.Data == null)
-                //    return OperationCollectionResult<TResult>.Invalid("Invalid search");
-                //if (data.Data.Any() == false)
-                //    return OperationCollectionResult<TResult>.NotFound("No records found.");
-
-                //return OperationCollectionResult<TResult>.Success(data.Data);
+              
 
             }
             catch (Exception ex)
