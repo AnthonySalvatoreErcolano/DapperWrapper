@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using DapperWrapper.Attributes;
+using DapperWrapperAttributes.Attributes;
 using System.Reflection;
 
 namespace DapperWrapper.Builders
@@ -63,7 +63,7 @@ namespace DapperWrapper.Builders
 
             if (!columns.Any()) throw new InvalidOperationException("No columns found to insert");
 
-            var sql = $"INSERT INTO {tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
+            var sql = $"INSERT INTO dbo.{tableName} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)})";
             return (sql, parameters);
         }
 

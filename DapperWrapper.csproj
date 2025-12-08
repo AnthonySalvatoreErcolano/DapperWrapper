@@ -7,10 +7,9 @@
 
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>AE.DapperWrapper</PackageId>
-		<Version>1.0.5</Version>
+		<Version>1.0.7</Version>
 		<PackageReleaseNotes>
-			- Updated to .NET 10
-			- Added extensions to `OperationResult`, `OperationResult&lt;T&gt;`and `OperationCollectionResult&lt;T&gt;` to determine response values and whether there is returned data.
+			- Moved Table and Column attributes to separate package AE.DapperWrapperAttributes.
 		</PackageReleaseNotes>
 		<Authors>Anthony Ercolano</Authors>
 		<Description>Lightweight Dapper wrapper with standardized responses.</Description>
@@ -26,6 +25,7 @@
 
 
 	<ItemGroup>
+    <PackageReference Include="AE.DapperWrapperAttributes" Version="1.0.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
 	</ItemGroup>
